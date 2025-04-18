@@ -6,13 +6,15 @@ use actix_files as fsx;
 use actix_web::{get, web, App, HttpServer, HttpResponse, Responder};
 use lazy_static::lazy_static;
 use std::fs;
-use std::sync::{Mutex};
+use std::sync::{Arc, Mutex};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
 use crate::settings::Settings;
+use crate::songbites::Songbite;
 
 pub mod settings;
+pub mod songbites;
 
 // Create a global variable for application settings.
 // This will be available in other files.
@@ -51,7 +53,7 @@ async fn help(settings: web::Data<Settings>) -> impl Responder {
 async fn main() -> std::io::Result<()> {
     // Create folders if they don't already exist.
     fs::create_dir_all("./logs")?;
-    fs::create_dir_all("./songbits")?;
+    fs::create_dir_all("./songbites")?;
 
     // Logging configuration held in log4rs.yml .
     log4rs::init_file("log4rs.yml", Default::default()).unwrap();
@@ -61,11 +63,15 @@ async fn main() -> std::io::Result<()> {
     // Do initial program version logging, mainly as a test.
     info!("Application started: {} v({})", settings.program_name, settings.program_ver);
 
+    // Instantiate a fractals struct.
+    // Call init method to initialise struct.
+    let _songbite = Arc::new(Mutex::new(Songbite::init()));
+
     // Create and start web service.
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(settings.clone()))
-            .service(fsx::Files::new("/songbits", "./songbits").show_files_listing())
+            .service(fsx::Files::new("/songbits", "./songbites").show_files_listing())
             .service(intro)
             .service(actix_files::Files::new("/static", "./static").show_files_listing())
             .route("/help", web::get().to(help))
