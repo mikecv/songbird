@@ -6,5 +6,5 @@ pub struct Settings {
     pub program_ver: String,
     pub program_devs: Vec<String>,
     pub program_web: String,
-    pub songbits_folder: String,
+    pub songbites_folder: String,
 }

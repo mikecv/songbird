@@ -6,12 +6,20 @@
     <link rel="stylesheet" href="/static/index-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/static/favicon.png">
-    <title>Fractals</title>
+    <title>Songbird</title>
 </head>
 <body>
     <h1>Songbird</h1>
-    <p style="text-align:left;">(Help can be found <a href="/help" target="_blank">here)</a>.</p>
+    <p style="text-align:center;">(Help can be found <a href="/help" target="_blank">here)</a>.</p>
 
+    <!-- Button to load a music file. -->
+    <form id="audioUploadForm" enctype="multipart/form-data">
+        <input type="file" id="audioFile" name="audioFile" accept=".mp3,audio/*">
+        <button type="submit">Upload Audio</button>
+    </form>
+    
+    <div id="uploadStatus"></div>
+    
     <!-- Include JS script functions. -->
     <script type="text/javascript" src="/static/index-scripts.js"></script>
 
