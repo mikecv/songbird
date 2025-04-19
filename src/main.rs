@@ -2,13 +2,18 @@
 
 use log::info;
 use log4rs;
+
 use actix_files as fsx;
-use actix_web::{get, web, App, HttpServer, HttpResponse, Responder};
+use actix_multipart::Multipart;
+use actix_web::{get, web, App, HttpServer, HttpResponse, Responder, post};
+use futures_util::StreamExt;
+use futures_util::TryStreamExt;
 use lazy_static::lazy_static;
 use std::fs;
 use std::sync::{Arc, Mutex};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
+use tokio::io::AsyncWriteExt;
 
 use crate::settings::Settings;
 use crate::songbites::Songbite;
@@ -34,6 +39,28 @@ lazy_static! {
 #[get("/")]
 async fn intro() -> impl Responder {
     HttpResponse::Ok().content_type("text/html").body(include_str!("../static/index.html"))
+}
+
+#[post("/upload-audio")]
+async fn upload_audio(mut payload: Multipart) -> impl Responder {
+
+    // Get application settings in scope.
+    let settings: Settings = SETTINGS.lock().unwrap().clone();
+
+    while let Ok(Some(mut field)) = payload.try_next().await {
+        let content_disposition = field.content_disposition().unwrap();
+        let filename = content_disposition.get_filename().unwrap_or("upload.mp3");
+        info!("Music file selected: {:?}", filename);
+        let filepath = format!("{}{}", settings.songbites_folder, sanitize_filename::sanitize(filename));
+        info!("Music file uploaded path: {:?}", filepath);
+
+        let mut f = File::create(filepath).await.unwrap();
+        while let Some(chunk) = field.next().await {
+            let data = chunk.unwrap();
+            f.write_all(&data).await.unwrap();
+        }
+    }
+    HttpResponse::Ok().body("File uploaded successfully!")
 }
 
 async fn help(settings: web::Data<Settings>) -> impl Responder {
@@ -63,7 +90,7 @@ async fn main() -> std::io::Result<()> {
     // Do initial program version logging, mainly as a test.
     info!("Application started: {} v({})", settings.program_name, settings.program_ver);
 
-    // Instantiate a fractals struct.
+    // Instantiate a songbite struct.
     // Call init method to initialise struct.
     let _songbite = Arc::new(Mutex::new(Songbite::init()));
 
@@ -73,6 +100,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(settings.clone()))
             .service(fsx::Files::new("/songbits", "./songbites").show_files_listing())
             .service(intro)
+            .service(upload_audio)
             .service(actix_files::Files::new("/static", "./static").show_files_listing())
             .route("/help", web::get().to(help))
     })

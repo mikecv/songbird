@@ -3,4 +3,4 @@ program_name:       "Songbird"
 program_ver:        0.0.1
 program_devs:       ["Michael Cvitanovich"]
 program_web:        "galacticwingcommander"    
-songbits_folder:    "./songbites"
+songbites_folder:   "./songbites/"
