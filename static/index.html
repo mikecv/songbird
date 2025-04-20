@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/static/index-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/static/favicon.png">
+    <script src="https://unpkg.com/wavesurfer.js"></script>
     <title>Songbird</title>
 </head>
 <body>
@@ -17,9 +18,14 @@
         <input type="file" id="audioFile" name="audioFile" accept=".mp3,audio/*">
         <button type="submit">Upload Audio</button>
     </form>
-    
+
+    <!-- Status of sound file upload. -->
     <div id="uploadStatus"></div>
-    
+
+    <!-- Sound wave and controls. -->
+    <div id="waveform" style="margin-top:20px;"></div>
+    <button id="playPauseBtn">Play/Pause</button>
+
     <!-- Include JS script functions. -->
     <script type="text/javascript" src="/static/index-scripts.js"></script>
 
