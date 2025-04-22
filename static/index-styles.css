@@ -32,8 +32,23 @@ p {
     margin-bottom: 1.0em ;
 }
 
+/* Left alignment as for audio status. */
+.upload-status {
+    text-align: left;
+    margin-top: 10px;
+    margin-left: 0px;
+    font-weight: 500;
+    color: #32659c;
+}
+
+/* Centre alignment as for play/pause button. */
+.center-controls {
+    text-align: center;
+    margin-top: 15px;
+}
+
 #waveform {
-    border: 2px solid #4e5d6c;
+    border: 2px solid #98afc7;
     background-color: #ffffff;
     border-radius: 10px;
     padding: 12px;
@@ -47,10 +62,9 @@ p {
 
 /* Optional: play button styling */
 #playPauseBtn {
-    margin-top: 15px;
     padding: 10px 20px;
     font-size: 1em;
-    background-color: #1DB954;
+    background-color: #6374d9;
     color: white;
     border: none;
     border-radius: 6px;
@@ -58,6 +72,14 @@ p {
     transition: background-color 0.3s ease;
 }
 
+/* Play button on hover. */
 #playPauseBtn:hover {
-    background-color: #17a54d;
+    background-color: #4e49e4;
+}
+
+/* Speed control styling. */
+#speedSlider {
+    width: 200px;
+    margin-left: 10px;
+    vertical-align: middle;
 }

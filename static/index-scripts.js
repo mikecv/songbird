@@ -1,23 +1,40 @@
 // index-scripts.js
 
-// Event listener for onload.
+console.log('Script loaded...');
+
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("audioUploadForm");
     const statusDiv = document.getElementById("uploadStatus");
     const playPauseBtn = document.getElementById("playPauseBtn");
 
+    const speedSlider = document.getElementById("speedSlider");
+    const speedValue = document.getElementById("speedValue");
+
     const wavesurfer = WaveSurfer.create({
         container: "#waveform",
-        waveColor: "#76c7f0",        // bright aqua
-        progressColor: "#1DB954",    // vibrant Spotify green
-        cursorColor: "#ff4d4f",      // bold red for contrast
+        waveColor: "#76c7f0",
+        progressColor: "#1DB954",
+        cursorColor: "#ff4d4f",
         height: 128,
         responsive: true,
         normalize: true,
-        cursorWidth: 2
+        cursorWidth: 2,
+        backend: 'WebAudio',
+        mediaControls: false,
     });
 
-    // Event listener for upload audio button pressed.
+    // Check for wavesurfer version.
+    console.log("WaveSurfer version:", WaveSurfer.VERSION);
+
+    // Handle playback speed changes'
+    speedSlider.addEventListener("input", function () {
+        const rate = parseFloat(speedSlider.value);
+        wavesurfer.setPlaybackRate(rate);
+        speedValue.textContent = `${rate.toFixed(2)}×`;
+        console.log("Playback rate:", wavesurfer.getPlaybackRate());
+    });
+
+    // Upload and load audio.
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -48,6 +65,13 @@ document.addEventListener("DOMContentLoaded", function () {
             statusDiv.innerText = `Uploaded successfully: ${filename}`;
 
             wavesurfer.load(`/audio?file=${filename}`)
+                .then(() => {
+                    wavesurfer.once('ready', () => {
+                        const rate = parseFloat(speedSlider.value);
+                    
+                        wavesurfer.setPlaybackRate(rate);
+                    });
+                })
                 .catch(err => console.error("WaveSurfer load error:", err));
 
         } catch (error) {
@@ -56,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // Play/pause toggle.
     playPauseBtn.addEventListener("click", function () {
         wavesurfer.playPause();
     });

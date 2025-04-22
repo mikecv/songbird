@@ -7,11 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/static/favicon.png">
     <script src="https://unpkg.com/wavesurfer.js"></script>
+
     <title>Songbird</title>
 </head>
 <body>
     <h1>Songbird</h1>
-    <p style="text-align:center;">(Help can be found <a href="/help" target="_blank">here)</a>.</p>
+    <p style="text-align:center;">Application to slow music down without changing pitch.<br>
+        Possible uses are for youger musicians to work out notes played in quick music.<br>
+        (Help can be found <a href="/help" target="_blank">here)</a>.</p>
 
     <!-- Button to load a music file. -->
     <form id="audioUploadForm" enctype="multipart/form-data">
@@ -20,12 +23,21 @@
     </form>
 
     <!-- Status of sound file upload. -->
-    <div id="uploadStatus"></div>
+    <div id="uploadStatus" class="upload-status"></div>
 
     <!-- Sound wave and controls. -->
     <div id="waveform" style="margin-top:20px;"></div>
-    <button id="playPauseBtn">Play/Pause</button>
-
+    <div class="center-controls">
+        <button id="playPauseBtn">Play/Pause</button>
+    </div>
+    
+    <!-- Speed control of playback. -->
+    <div class="center" style="margin-top: 20px;">
+        <label for="speedSlider">Playback Speed:</label>
+        <input type="range" id="speedSlider" min="0.25" max="1" step="0.25" value="1">
+        <span id="speedValue">1.0×</span>
+    </div>
+    
     <!-- Include JS script functions. -->
     <script type="text/javascript" src="/static/index-scripts.js"></script>
 
