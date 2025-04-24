@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const wavesurfer = WaveSurfer.create({
         container: "#waveform",
+        scrollParent: true,
+        minPxPerSec: 100,      
         waveColor: "#76c7f0",
         progressColor: "#1DB954",
         cursorColor: "#ff4d4f",
@@ -34,6 +36,16 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Playback rate:", wavesurfer.getPlaybackRate());
     });
 
+    // Zoom control.
+    document.getElementById('zoomSlider').addEventListener('input', function(event) {
+        var zoomLevel = event.target.value;
+        wavesurfer.zoom(zoomLevel);
+
+        // Update the displayed zoom value.
+        document.getElementById('zoomValue').textContent = zoomLevel + '×';
+
+    });
+    
     // Upload and load audio.
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
