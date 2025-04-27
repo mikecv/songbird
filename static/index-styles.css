@@ -32,8 +32,26 @@ p {
     margin-bottom: 1.0em ;
 }
 
+/* Ensure the upload status is below the form */
+#audioUploadForm {
+    display: flex;
+    align-items: flex-start;
+}
+
+/* Style the upload status text to align it better */
+#uploadStatus {
+    margin-top: 10px;
+    text-align: left;
+}
+
+/* Centre alignment as for play/pause/loop button. */
+.center-controls {
+    text-align: center;
+    margin-top: 15px;
+}
+
 #waveform {
-    border: 2px solid #4e5d6c;
+    border: 2px solid #98afc7;
     background-color: #ffffff;
     border-radius: 10px;
     padding: 12px;
@@ -45,12 +63,24 @@ p {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Optional: play button styling */
-#playPauseBtn {
-    margin-top: 15px;
+#timeline {
+    border: 2px solid #98afc7;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 10px;
+    width: 90%;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Pause/play button styling */
+#playPauseButton {
     padding: 10px 20px;
     font-size: 1em;
-    background-color: #1DB954;
+    background-color: #17c61a;
     color: white;
     border: none;
     border-radius: 6px;
@@ -58,6 +88,49 @@ p {
     transition: background-color 0.3s ease;
 }
 
-#playPauseBtn:hover {
-    background-color: #17a54d;
+/* Pause/play button styling */
+#playPauseButton.paused {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #c76e0e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Rewind button styling */
+#rewindButton {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #4a4c57;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#rewindButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 200px;
+    margin: 20px auto;
+}
+
+.slider-container > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.slider-container label {
+    margin-right: 10px;
 }

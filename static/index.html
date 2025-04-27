@@ -6,28 +6,57 @@
     <link rel="stylesheet" href="/static/index-styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/static/favicon.png">
-    <script src="https://unpkg.com/wavesurfer.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js@4.0.0/dist/wavesurfer.min.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js@4.0.0/dist/plugin/wavesurfer.regions.min.js"></script>
+    <script src="https://unpkg.com/wavesurfer.js@4.0.0/dist/plugin/wavesurfer.timeline.min.js"></script>
+            
     <title>Songbird</title>
 </head>
 <body>
     <h1>Songbird</h1>
-    <p style="text-align:center;">(Help can be found <a href="/help" target="_blank">here)</a>.</p>
-
-    <!-- Button to load a music file. -->
-    <form id="audioUploadForm" enctype="multipart/form-data">
-        <input type="file" id="audioFile" name="audioFile" accept=".mp3,audio/*">
-        <button type="submit">Upload Audio</button>
-    </form>
+    <p style="text-align:center;">Application to slow music down without changing pitch.<br>
+        Possible uses are for youger musicians to work out notes played in quick music.<br>
+        (Help can be found <a href="/help" target="_blank">here)</a>.</p>
 
     <!-- Status of sound file upload. -->
+    <form id="audioUploadForm" enctype="multipart/form-data">
+        <input type="file" name="audioFile" id="audioFileInput" accept="audio/*" required />
+        <button type="submit">Upload</button>
+    </form>
+
+    <!-- Waveform file upload status. -->
     <div id="uploadStatus"></div>
 
-    <!-- Sound wave and controls. -->
+        <!-- Waveform file update status. -->
     <div id="waveform" style="margin-top:20px;"></div>
-    <button id="playPauseBtn">Play/Pause</button>
+    <div id="timeline" style="margin-top: 10px;"></div>
 
+    <!-- Sound file play, pause and rewind function. -->
+    <div class="center-controls">
+        <button id="playPauseButton">Play</button> <!-- Play/Pause Button -->
+        <button id="rewindButton" disabled>Rewind</button> <!-- Rewind Button -->
+    </div>
+
+    <!-- Container for zoom and playback speed slider controls. -->
+     <!-- In the same div so that sliders line up nicely. -->
+    <div class="slider-container">
+        <!-- Slider for zoom. -->
+        <div>
+            <label for="zoomSlider">Zoom:</label>
+            <input type="range" id="zoomSlider" min="100" max="500" value="100" />
+            <span id="zoomValue">1×</span>
+        </div>
+    
+        <!-- Slider for playback speed. -->
+        <div>
+            <label for="speedSlider">Speed:</label>
+            <input type="range" id="speedSlider" min="0.5" max="1" step="0.1" value="1" />
+            <span id="speedValue">1×</span>
+        </div>
+    </div>
+    
     <!-- Include JS script functions. -->
-    <script type="text/javascript" src="/static/index-scripts.js"></script>
-
+    <!-- Needs to be of type "module" for wavesurfer. -->
+    <script type="module" src="./static/index-scripts.js"></script>
 </body>
 </html>
