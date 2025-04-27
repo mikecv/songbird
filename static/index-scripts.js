@@ -1,99 +1,140 @@
-// index-scripts.js
-
-console.log('Script loaded...');
-
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("audioUploadForm");
-    const statusDiv = document.getElementById("uploadStatus");
-    const playPauseBtn = document.getElementById("playPauseBtn");
+    const playPauseBtn = document.getElementById("playPauseButton");
+    const rewindBtn = document.getElementById("rewindButton");
+    const form = document.getElementById("audioUploadForm");  // Define the form variable
+    const statusDiv = document.getElementById("uploadStatus");  // Define the status div
+    const speedSlider = document.getElementById("speedSlider"); // Define the speedSlider variable
+    const zoomSlider = document.getElementById("zoomSlider"); // Define the zoomSlider variable
+    const speedValue = document.getElementById("speedValue"); // Define the speedValue element
+    const zoomValue = document.getElementById("zoomValue"); // Define the zoomValue element
 
-    const speedSlider = document.getElementById("speedSlider");
-    const speedValue = document.getElementById("speedValue");
+    // Disable the rewind button by default
+    rewindBtn.disabled = true;
 
+    // Check if buttons are properly selected
+    if (!playPauseBtn || !rewindBtn || !form || !statusDiv || !speedSlider || !zoomSlider || !speedValue || !zoomValue) {
+        console.error('One or more elements not found.');
+        return; // Exit if any element is not found
+    }
+
+    // Create WaveSurfer instance
     const wavesurfer = WaveSurfer.create({
-        container: "#waveform",
-        scrollParent: true,
-        minPxPerSec: 100,      
-        waveColor: "#76c7f0",
-        progressColor: "#1DB954",
-        cursorColor: "#ff4d4f",
+        container: '#waveform',
+        waveColor: '#76c7f0',
+        progressColor: '#1DB954',
+        cursorColor: '#000000',
         height: 128,
-        responsive: true,
         normalize: true,
-        cursorWidth: 2,
         backend: 'WebAudio',
         mediaControls: false,
+        plugins: [
+            WaveSurfer.regions.create(),
+            WaveSurfer.timeline.create({
+                container: '#timeline'
+            })
+        ]
     });
 
-    // Check for wavesurfer version.
-    console.log("WaveSurfer version:", WaveSurfer.VERSION);
+    wavesurfer.on('ready', () => {
+        console.log('WaveSurfer is ready, adding regions now.');
+        if (wavesurfer.regions) {
+            console.log('Regions plugin initialized successfully.');
 
-    // Handle playback speed changes'
-    speedSlider.addEventListener("input", function () {
-        const rate = parseFloat(speedSlider.value);
-        wavesurfer.setPlaybackRate(rate);
-        speedValue.textContent = `${rate.toFixed(2)}×`;
-        console.log("Playback rate:", wavesurfer.getPlaybackRate());
-    });
+            const region = wavesurfer.regions.add({
+                start: 5,
+                end: 15,
+                color: 'rgba(243, 37, 30, 0.3)',
+                drag: true,
+                resize: true,
+            });
 
-    // Zoom control.
-    document.getElementById('zoomSlider').addEventListener('input', function(event) {
-        var zoomLevel = event.target.value;
-        wavesurfer.zoom(zoomLevel);
-
-        // Update the displayed zoom value.
-        document.getElementById('zoomValue').textContent = zoomLevel + '×';
-
-    });
-    
-    // Upload and load audio.
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const fileInput = document.getElementById("audioFile");
-        const file = fileInput.files[0];
-
-        if (!file) {
-            statusDiv.innerText = "Please select an audio file to upload.";
-            return;
+            const regionId = region.id;
+            console.log('Region created:', region);
+        } else {
+            console.error("Regions plugin not initialized.");
         }
+    });
 
-        const formData = new FormData();
-        formData.append("audioFile", file);
-
+    // File upload handler
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
         try {
             const response = await fetch("/upload_audio", {
                 method: "POST",
                 body: formData
             });
 
-            if (!response.ok) {
-                throw new Error("Upload failed.");
-            }
+            if (!response.ok) throw new Error(`Status: ${response.status}`);
 
-            const data = await response.json();
-            const filename = data.filename;
-
-            statusDiv.innerText = `Uploaded successfully: ${filename}`;
-
-            wavesurfer.load(`/audio?file=${filename}`)
-                .then(() => {
-                    wavesurfer.once('ready', () => {
-                        const rate = parseFloat(speedSlider.value);
-                    
-                        wavesurfer.setPlaybackRate(rate);
-                    });
-                })
-                .catch(err => console.error("WaveSurfer load error:", err));
-
+            const result = await response.json();
+            statusDiv.textContent = `✅ Uploaded: ${result.filename}`;
+            wavesurfer.load(result.url);
         } catch (error) {
-            console.error("Error uploading audio:", error);
-            statusDiv.innerText = "Error uploading audio.";
+            console.error("Upload failed:", error);
+            statusDiv.textContent = "❌ Upload failed.";
         }
     });
 
-    // Play/pause toggle.
-    playPauseBtn.addEventListener("click", function () {
+    // Assuming you have a wavesurfer instance
+    wavesurfer.on('play', () => {
+        playPauseBtn.textContent = 'Pause';
+        playPauseBtn.classList.add('paused');
+        playPauseBtn.classList.remove('playing');
+
+        // Disable the rewind button when the audio is playing (unless it's at the end).
+        if (wavesurfer.getCurrentTime() < wavesurfer.getDuration()) {
+            rewindBtn.disabled = true;
+        }
+    });
+
+    wavesurfer.on('pause', () => {
+        // Enable the rewind button if the audio is paused (even if it's not at the end)
+        if (wavesurfer.getCurrentTime() < wavesurfer.getDuration()) {
+            rewindBtn.disabled = false;
+        }
+        playPauseBtn.textContent = 'Play';
+        playPauseBtn.classList.remove('paused');
+        playPauseBtn.classList.add('playing');
+      });
+
+    // Listen to when the audio reaches the end
+    wavesurfer.on('finish', () => {
+        // Enable the rewind button when the audio finishes.
+        rewindBtn.disabled = false;
+    });
+        
+    // Play or pause button
+    playPauseBtn.addEventListener("click", () => {
         wavesurfer.playPause();
+    });
+
+    // Rewind button
+    rewindBtn.addEventListener("click", () => {
+        wavesurfer.seekTo(0);
+
+        if (!rewindBtn.disabled) {
+            wavesurfer.seekTo(0);
+        }        
+    });
+
+    // Speed control slider (ensure it goes from 0.5 to 1).
+    speedSlider.addEventListener("input", (e) => {
+        let rate = parseFloat(e.target.value);
+        // Ensure the rate doesn't go beyond 1 (no faster than normal speed).
+        if (rate > 1) rate = 1; // Cap at 1 (normal speed)
+        wavesurfer.setPlaybackRate(rate);
+        speedValue.textContent = `${rate.toFixed(1)}×`;
+    });
+
+    // Zoom control slider
+    zoomSlider.addEventListener("input", (e) => {
+        const zoomLevel = parseInt(e.target.value, 10);
+        wavesurfer.zoom(zoomLevel);
+        zoomValue.textContent = `${(zoomLevel / 100).toFixed(1)}×`;
+        const labelInterval = zoomLevel >= 200 ? 1 : 2;
+        wavesurfer.timeline.update({
+            primaryLabelInterval: labelInterval
+        });
     });
 });
